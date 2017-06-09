@@ -50,7 +50,6 @@ let Events = function() {
 }()
 
 var proto = Element.prototype
-
 proto.on = Events.on
 proto.off = Events.off
 proto.once = Events.once
