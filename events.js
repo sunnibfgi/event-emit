@@ -1,7 +1,9 @@
 (function(global) {
+  'use strict'
+  
   var Events = function() {
     var events = events || {}
-
+    
     function on(type, listen) {
       var listener = events[type] = events[type] || []
       if (listen in listener) delete listener[listen]
