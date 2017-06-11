@@ -1,56 +1,59 @@
-var Events = function() {
+(function(global) {
+  var Events = function() {
+    var events = events || {}
 
-  var events = events || {}
-
-  function on(type, listen, once) {
-    once = once || false
-    events[type] = events[type] || []
-    if (~~events[type].indexOf(listen)) {
-      events[type].push({
-        type: type,
-        listen: listen,
-        once: once
-      })
+    function on(type, listen) {
+      var listener = events[type] = events[type] || []
+      if (listen in listener) delete listener[listen]
+      if (~~listener.indexOf(listen)) listener.push(listen)
+      return this
     }
-    return this
-  }
 
-  function off(type, listen) {
-    if (!events[type]) return
-    for (var i = 0; i < events[type].length; i++) {
-      if (events[type][i].listen = listen)
-        events[type].splice(i, 1)
+    function once(type, listen) {
+      var listener = []
+      this.on(type, listen)
+      listener = events[type]
+      listener[listen] = 0
     }
-    return this
-  }
 
-  function once(type, listen) {
-    this.on(type, listen, true)
-  }
-
-  function emit(type) {
-    if (!events[type]) return
-    var args = [].slice.call(arguments, 1)
-    for (var i = 0, len = events[type].length; i < len; i++) {
-      events[type][i] && events[type][i].listen.apply(null, args)
-      if (events[type][i] && events[type][i].once)
-        delete events[type][i]
+    function off(type, listen) {
+      var listener = events[type]
+      if (!listener) return
+      for (var i = 0; i < listener.length; i++) {
+        if (listener[i] == listen) {
+          var index = listener.indexOf(listen)
+          listener.splice(index, 1)
+        }
+      }
+      return this
     }
-    return this
-  }
 
-  return {
-    on,
-    off,
-    once,
-    emit
-  }
-
-}()
-
-var proto = Element.prototype
-
-proto.on = Events.on
-proto.off = Events.off
-proto.once = Events.once
-proto.emit = Events.emit
+    function emit(type) {
+      var listener = events[type],
+        args = [].slice.call(arguments, 1)
+      if (!listener) return
+      for (var i = 0; i < listener.length; i++) {
+        var listen = listener[i]
+        if (listen in listener && listener[listen] >= 1) {
+          continue
+        }
+        listen.apply(this, args)
+        listener[listen]++
+      }
+      return this
+    }
+    return {
+      on,
+      emit,
+      off,
+      once
+    }
+  }()
+  // collection html DOM
+  Element.prototype.on = Events.on
+  Element.prototype.off = Events.off
+  Element.prototype.once = Events.once
+  Element.prototype.emit = Events.emit
+  global.Events = Events
+  
+})(this)
