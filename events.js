@@ -20,6 +20,7 @@
 			this.on(type, listen)
 			listener = events[type]
 			listener[listen] = 0
+			return this
 		}
 
 		function off(type, listen) {
