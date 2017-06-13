@@ -1,5 +1,6 @@
 (function(global) {
 	'use strict'
+	
 	var Events = function() {
 
 		var events = events || {}
